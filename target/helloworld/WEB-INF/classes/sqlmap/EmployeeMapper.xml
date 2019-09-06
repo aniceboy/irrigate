@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springmvc.dao.EmployeeMapper" >
+  <resultMap id="BaseResultMap" type="com.springmvc.entity.Employee" >
+    <id column="en" property="en" jdbcType="CHAR" />
+    <result column="name" property="name" jdbcType="CHAR" />
+    <result column="password" property="password" jdbcType="CHAR" />
+    <result column="areaAn" property="areaan" jdbcType="CHAR" />
+    <result column="post" property="post" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    en, name, password, areaAn, post
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from employee
+    where en = #{en,jdbcType=CHAR}
+  </select>
+  <select id="selectSelective" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from employee
+    <where>
+      <if test="en != null" >
+        en = #{en,jdbcType=CHAR}
+      </if>
+      <if test="password != null" >
+        AND password = #{password,jdbcType=CHAR}
+      </if>
+    </where>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from employee
+    where en = #{en,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.springmvc.entity.Employee" >
+    insert into employee (en, name, password, areaAn, 
+      post)
+    values (#{en,jdbcType=CHAR}, #{name,jdbcType=CHAR}, #{password,jdbcType=CHAR}, #{areaan,jdbcType=CHAR}, 
+      #{post,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.springmvc.entity.Employee" >
+    insert into employee
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="en != null" >
+        en,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="areaan != null" >
+        areaAn,
+      </if>
+      <if test="post != null" >
+        post,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="en != null" >
+        #{en,jdbcType=CHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=CHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=CHAR},
+      </if>
+      <if test="areaan != null" >
+        #{areaan,jdbcType=CHAR},
+      </if>
+      <if test="post != null" >
+        #{post,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.springmvc.entity.Employee" >
+    update employee
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=CHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=CHAR},
+      </if>
+      <if test="areaan != null" >
+        areaAn = #{areaan,jdbcType=CHAR},
+      </if>
+      <if test="post != null" >
+        post = #{post,jdbcType=CHAR},
+      </if>
+    </set>
+    where en = #{en,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.Employee" >
+    update employee
+    set name = #{name,jdbcType=CHAR},
+      password = #{password,jdbcType=CHAR},
+      areaAn = #{areaan,jdbcType=CHAR},
+      post = #{post,jdbcType=CHAR}
+    where en = #{en,jdbcType=CHAR}
+  </update>
+</mapper>

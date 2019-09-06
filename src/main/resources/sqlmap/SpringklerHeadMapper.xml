@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springmvc.dao.SpringklerHeadMapper" >
+  <resultMap id="BaseResultMap" type="com.springmvc.entity.SpringklerHead" >
+    <id column="springkler_id" property="springklerId" jdbcType="INTEGER" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="installtime" property="installtime" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    springkler_id, location, installtime, state
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from springkler_head
+    where springkler_id = #{springklerId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from springkler_head
+    where springkler_id = #{springklerId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.springmvc.entity.SpringklerHead" >
+    insert into springkler_head (springkler_id, location, installtime, 
+      state)
+    values (#{springklerId,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR}, #{installtime,jdbcType=VARCHAR}, 
+      #{state,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.springmvc.entity.SpringklerHead" >
+    insert into springkler_head
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="springklerId != null" >
+        springkler_id,
+      </if>
+      <if test="location != null" >
+        location,
+      </if>
+      <if test="installtime != null" >
+        installtime,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="springklerId != null" >
+        #{springklerId,jdbcType=INTEGER},
+      </if>
+      <if test="location != null" >
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="installtime != null" >
+        #{installtime,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.springmvc.entity.SpringklerHead" >
+    update springkler_head
+    <set >
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="installtime != null" >
+        installtime = #{installtime,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where springkler_id = #{springklerId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.SpringklerHead" >
+    update springkler_head
+    set location = #{location,jdbcType=VARCHAR},
+      installtime = #{installtime,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR}
+    where springkler_id = #{springklerId,jdbcType=INTEGER}
+  </update>
+</mapper>
