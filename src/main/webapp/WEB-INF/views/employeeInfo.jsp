@@ -19,6 +19,9 @@
             <a href="${pageContext.request.contextPath}/employee/change_password">修改密码</a>
             <a href="${pageContext.request.contextPath}/employee/login">切换用户</a>
         </div>
+        <div>
+            <a href="${pageContext.request.contextPath}/springklerHead/list">喷头管理</a>
+        </div>
     </c:if>
     <c:if test="${empty employee}">
         对不起，请先<a href="${pageContext.request.contextPath}/employee/login">登陆</a>
