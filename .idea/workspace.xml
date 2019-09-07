@@ -452,7 +452,7 @@
       <workItem from="1567641954767" duration="21376000" />
       <workItem from="1567728511316" duration="5868000" />
       <workItem from="1567777007579" duration="3895000" />
-      <workItem from="1567816149548" duration="30852000" />
+      <workItem from="1567816149548" duration="31109000" />
     </task>
     <task id="LOCAL-00001" summary="增加了部分管理功能">
       <created>1567859515830</created>
@@ -475,11 +475,18 @@
       <option name="project" value="LOCAL" />
       <updated>1567864384332</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="除了折线图马上OK">
+      <created>1567864787134</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1567864787134</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70736000" />
+    <option name="totallyTimeSpent" value="70993000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -492,9 +499,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22768533" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22768533" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -514,7 +520,7 @@
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.3289689" />
       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Messages" order="12" visible="true" weight="0.2852459" />
+      <window_info anchor="bottom" id="Messages" order="12" weight="0.6" />
       <window_info anchor="bottom" id="Java Enterprise" order="13" />
       <window_info anchor="bottom" id="Database Changes" order="14" />
       <window_info anchor="bottom" id="Version Control" order="15" weight="0.3295082" />
