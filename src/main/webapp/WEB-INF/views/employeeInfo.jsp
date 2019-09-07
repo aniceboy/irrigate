@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
   Created by IntelliJ IDEA.
   User: 牛萌
@@ -12,13 +13,16 @@
 </head>
 <body>
 <div>
-    <c:if test="${not empty user}">
-    <div>欢迎您，${user.name}${user.sex?'女士':'先生'}
-        <a href="${pageContext.request.contextPath}/index.jsp">注销</a></div></div>
-</c:if>
-<c:if test="${ empty user}">
-    对不起，请先<a href="${pageContext.request.contextPath}/employee/login">登录</a>
-</c:if>
+    <c:if test="${not empty employee}">
+        <div>欢迎您，${employee.name}先生
+            <a href="${pageContext.request.contextPath}/employee/logout">注销</a>
+            <a href="${pageContext.request.contextPath}/employee/change_password">修改密码</a>
+            <a href="${pageContext.request.contextPath}/employee/login">切换用户</a>
+        </div>
+    </c:if>
+    <c:if test="${empty employee}">
+        对不起，请先<a href="${pageContext.request.contextPath}/employee/login">登陆</a>
+    </c:if>
 </div>
 </body>
 </html>

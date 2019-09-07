@@ -1,11 +1,13 @@
 package com.springmvc.entity;
 
+import java.util.Date;
+
 public class SpringklerHead {
     private Integer springklerId;
 
     private String location;
 
-    private String installtime;
+    private Date installtime;
 
     private String state;
 
@@ -25,11 +27,11 @@ public class SpringklerHead {
         this.location = location;
     }
 
-    public String getInstalltime() {
+    public Date getInstalltime() {
         return installtime;
     }
 
-    public void setInstalltime(String installtime) {
+    public void setInstalltime(Date installtime) {
         this.installtime = installtime;
     }
 

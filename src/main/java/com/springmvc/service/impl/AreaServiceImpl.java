@@ -18,7 +18,7 @@ public class AreaServiceImpl implements AreaService {
     }
 
     public void edit(Area area) {
-        areaMapper.updateByPrimaryKey(area);
+        areaMapper.updateByPrimaryKeySelective(area);
     }
 
     public void remove(String an) {

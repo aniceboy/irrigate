@@ -1,8 +1,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%--
+  Created by IntelliJ IDEA.
+  User: 牛萌
+  Date: 2019/9/7
+  Time: 15:23
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>area列表</title>
+    <title>employee列表</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 引入 Bootstrap -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -14,14 +21,17 @@
         <div class="col-md-12 column">
             <div class="page-header">
                 <h1>
-                    <small>区域列表 —— 显示所有区域</small>
+                    <small>员工列表 —— 显示所有员工</small>
                 </h1>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4 column">
-            <a class="btn btn-primary" href="${pageContext.request.contextPath}/area/to_add">新增</a>
+            <a class="btn btn-primary"  href="${pageContext.request.contextPath}/employee/to_add">新增</a>
+        </div>
+        <div class="col-md-5 column">
+            <a class="btn btn-primary"  href="${pageContext.request.contextPath}/admin/adminInfo">返回</a>
         </div>
     </div>
     <div class="row clearfix">
@@ -37,15 +47,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                <c:forEach items="${list}" var="area">
+                <c:forEach items="${list}" var="employee">
                     <tr>
-                        <td>${area.an}</td>
-                        <td>${area.name}</td>
-                        <td>${area.location}</td>
-                        <td>${area.number}</td>
+                        <td>${employee.en}</td>
+                        <td>${employee.name}</td>
+                        <td>${employee.areaan}</td>
+                        <td>${employee.post}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/area/update?an=${area.an}">更改</a> |
-                            <a href="${pageContext.request.contextPath}/area/remove?an=${area.an}">删除</a>
+                            <a href="${pageContext.request.contextPath}/employee/to_update?en=${employee.en}">更改</a> |
+                            <a href="${pageContext.request.contextPath}/employee/remove?en=${employee.en}">删除</a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -54,3 +64,4 @@
         </div>
     </div>
 </div>
+

@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.springmvc.entity.SpringklerHead" >
     <id column="springkler_id" property="springklerId" jdbcType="INTEGER" />
     <result column="location" property="location" jdbcType="VARCHAR" />
-    <result column="installtime" property="installtime" jdbcType="VARCHAR" />
+    <result column="installtime" property="installtime" jdbcType="TIMESTAMP" />
     <result column="state" property="state" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
@@ -23,7 +23,7 @@
   <insert id="insert" parameterType="com.springmvc.entity.SpringklerHead" >
     insert into springkler_head (springkler_id, location, installtime, 
       state)
-    values (#{springklerId,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR}, #{installtime,jdbcType=VARCHAR}, 
+    values (#{springklerId,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR}, #{installtime,jdbcType=TIMESTAMP}, 
       #{state,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.springmvc.entity.SpringklerHead" >
@@ -50,7 +50,7 @@
         #{location,jdbcType=VARCHAR},
       </if>
       <if test="installtime != null" >
-        #{installtime,jdbcType=VARCHAR},
+        #{installtime,jdbcType=TIMESTAMP},
       </if>
       <if test="state != null" >
         #{state,jdbcType=VARCHAR},
@@ -64,7 +64,7 @@
         location = #{location,jdbcType=VARCHAR},
       </if>
       <if test="installtime != null" >
-        installtime = #{installtime,jdbcType=VARCHAR},
+        installtime = #{installtime,jdbcType=TIMESTAMP},
       </if>
       <if test="state != null" >
         state = #{state,jdbcType=VARCHAR},
@@ -75,7 +75,7 @@
   <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.SpringklerHead" >
     update springkler_head
     set location = #{location,jdbcType=VARCHAR},
-      installtime = #{installtime,jdbcType=VARCHAR},
+      installtime = #{installtime,jdbcType=TIMESTAMP},
       state = #{state,jdbcType=VARCHAR}
     where springkler_id = #{springklerId,jdbcType=INTEGER}
   </update>

@@ -1,3 +1,10 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: 牛萌
+  Date: 2019/9/7
+  Time: 15:37
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -13,18 +20,19 @@
         <div class="col-md-12 column">
             <div class="page-header">
                 <h1>
-                    <small>修改区域</small>
+                    <small>修改员工</small>
                 </h1>
             </div>
         </div>
     </div>
 
-    <form action="${pageContext.request.contextPath}/area/update" method="post">
-        <input type="hidden" name="an" value="${area.an}"/>
-        区域名称：<input type="text" name="name" value="${area.name}"/>
-        区域地址：<input type="text" name="location" value="${area.location}"/>
-        区域数量：<input type="text" name="number" value="${area.number}"/>
+    <form action="${pageContext.request.contextPath}/employee/update" method="post">
+        <input type="hidden" name="en" value="${employee.en}"/>
+        员工名字：<input type="text" name="name" value="${employee.name}"/>
+        员工区域：<input type="text" name="areaan" value="${employee.areaan}"/>
+        员工职位：<input type="text" name="post" value="${employee.post}"/>
         <input type="submit" value="提交" />
     </form>
 </div>
-
+</body>
+</html>

@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    <form action="${pageContext.request.contextPath}/area/add" method="post">
+    <form action="${pageContext.request.contextPath}/area/admin/add" method="post">
         区&nbsp;&nbsp;域&nbsp;&nbsp;
         编号：<input type="text" name="an"><br><br><br>
         区域名称：<input type="text" name="name"><br><br><br>
@@ -32,5 +32,7 @@
         区域数量：<input type="text" name="number"><br><br><br>
         <input type="submit" value="添加"  >
     </form>
-
 </div>
+</body>
+</html>
+

@@ -16,6 +16,19 @@
     from admin
     where an = #{an,jdbcType=CHAR}
   </select>
+  <select id="selectSelective" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from admin
+    <where>
+      <if test="an != null" >
+        an = #{an,jdbcType=CHAR}
+      </if>
+      <if test="password != null" >
+        AND password = #{password,jdbcType=CHAR}
+      </if>
+    </where>
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from admin
     where an = #{an,jdbcType=CHAR}

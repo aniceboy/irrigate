@@ -7,7 +7,7 @@ public class SensorData {
 
     private Integer direction;
 
-    private Integer springklerId;
+    private Integer springklerSId;
 
     private Date rTime;
 
@@ -33,12 +33,12 @@ public class SensorData {
         this.direction = direction;
     }
 
-    public Integer getSpringklerId() {
-        return springklerId;
+    public Integer getSpringklerSId() {
+        return springklerSId;
     }
 
-    public void setSpringklerId(Integer springklerId) {
-        this.springklerId = springklerId;
+    public void setSpringklerSId(Integer springklerSId) {
+        this.springklerSId = springklerSId;
     }
 
     public Date getrTime() {
