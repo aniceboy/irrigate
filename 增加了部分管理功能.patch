@@ -1,0 +1,1402 @@
+Index: target/helloworld/WEB-INF/views/login.jsp
+===================================================================
+--- target/helloworld/WEB-INF/views/login.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ target/helloworld/WEB-INF/views/login.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
+@@ -1,36 +0,0 @@
+-<%--
+-  Created by IntelliJ IDEA.
+-  User: 牛萌
+-  Date: 2019/9/4
+-  Time: 21:07
+-  To change this template use File | Settings | File Templates.
+---%>
+-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+-<html>
+-<head>
+-    <title>登录页面</title>
+-</head>
+-<body>
+-<div>
+-    <form id="zc" action="${pageContext.request.contextPath}/emloyee/login" method="post" >
+-        用户名：<input type="text" required id="en" name="en"><br>
+-        密  码：<input type="password" required id="password" name="password"><br>
+-        <input type="submit" value="登录">
+-    </form>
+-</div>
+-</body>
+-<script>
+-    //对应后台返回的提示
+-    if ('${status}' != '') {
+-        if ('${status}' == 0) {
+-            alert('登录成功,即将跳转至用户详情页！')
+-            location.href = '${pageContext.request.contextPath}/employee/employeeInfo'
+-        }else if ('${status}' == 1) {
+-            alert('该账户不存在！');
+-        }
+-        else if ('${status}' == 2) {
+-            alert('密码错误！')
+-        }
+-    }
+-</script>
+-</html>
+Index: src/main/webapp/WEB-INF/web.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/WEB-INF/web.xml	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/webapp/WEB-INF/web.xml	(date 1567828402420)
+@@ -54,9 +54,9 @@
+     <param-value> classpath:spring/applicationContext.xml</param-value>
+   </context-param>
+   <!-- 欢迎页面-->
+-<!--  <welcome-file-list>-->
+-<!--    <welcome-file>/WEB-INF/index.jsp</welcome-file>-->
+-<!--  </welcome-file-list>-->
++  <welcome-file-list>
++    <welcome-file>/WEB-INF/views/initial.jsp</welcome-file>
++  </welcome-file-list>
+   <!--404错误展示页面，可自行配置-->
+   <!--<error-page>-->
+   <!--<error-code>404</error-code>-->
+Index: src/main/webapp/WEB-INF/views/area_list.jsp
+===================================================================
+--- src/main/webapp/WEB-INF/views/area_list.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/webapp/WEB-INF/views/admin_area_list.jsp	(date 1567844246259)
+@@ -21,7 +21,10 @@
+     </div>
+     <div class="row">
+         <div class="col-md-4 column">
+-            <a class="btn btn-primary" href="${pageContext.request.contextPath}/area/to_add">新增</a>
++            <a class="btn btn-primary"  href="${pageContext.request.contextPath}/area/admin/to_add">新增</a>
++        </div>
++        <div class="col-md-5 column">
++            <a class="btn btn-primary"  href="${pageContext.request.contextPath}/admin/adminInfo">返回</a>
+         </div>
+     </div>
+     <div class="row clearfix">
+@@ -44,8 +47,8 @@
+                         <td>${area.location}</td>
+                         <td>${area.number}</td>
+                         <td>
+-                            <a href="${pageContext.request.contextPath}/area/update?an=${area.an}">更改</a> |
+-                            <a href="${pageContext.request.contextPath}/area/remove?an=${area.an}">删除</a>
++                            <a href="${pageContext.request.contextPath}/area/admin/to_update?an=${area.an}">更改</a> |
++                            <a href="${pageContext.request.contextPath}/area/admin/remove?an=${area.an}">删除</a>
+                         </td>
+                     </tr>
+                 </c:forEach>
+Index: src/main/webapp/index.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/index.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/webapp/index.jsp	(date 1567827939205)
+@@ -1,6 +1,6 @@
+ <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+ <html>
+ <body>
+-<a href="${pageContext.request.contextPath}/area/list">员工登陆</a>
++<a href="${pageContext.request.contextPath}/initial">进入主界面</a>
+ </body>
+ </html>
+Index: src/main/java/com/springmvc/controller/areaController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/springmvc/controller/areaController.java	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/java/com/springmvc/controller/areaController.java	(date 1567843381163)
+@@ -5,34 +5,38 @@
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestMapping;
+-import org.springframework.web.bind.annotation.RequestMethod;
+ 
+ import java.util.Map;
+ 
+ @Controller
+-@RequestMapping("/area")
++@RequestMapping("/area/admin")
+ public class areaController {
+     @Autowired
+     private AreaService areaService;
+     @RequestMapping(value = "/list")
+     public String list(Map<String,Object> map){
+         map.put("list",areaService.getAll());
+-        return "area_list";
++        return "admin_area_list";
+     }
+     @RequestMapping("/to_add")
+     public String toAdd(Map<String,Object>map){
+         map.put("area",new Area());
+-        return "area_add";
++        return "admin_area_add";
+     }
+     @RequestMapping("/add")
+     public String add(Area area){
+         areaService.add(area);
+         return "redirect:list";
+     }
+-    @RequestMapping("/update")
++    @RequestMapping(value = "/to_update")
+     public String toUpdate(String an,Map<String,Object>map){
+         map.put("area",areaService.get(an));
+-        return "area_update";
++        return "admin_area_update";
++    }
++    @RequestMapping("/update")
++    public String update(Area area){
++        areaService.edit(area);
++        return "redirect:list";
+     }
+     @RequestMapping(value = "/remove",params = "an")
+     public String remove(String an){
+Index: src/main/java/com/springmvc/dao/AdminMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/springmvc/dao/AdminMapper.java	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/java/com/springmvc/dao/AdminMapper.java	(date 1567821106243)
+@@ -2,11 +2,17 @@
+ 
+ import com.springmvc.entity.Admin;
+ 
++import java.util.ArrayList;
++
+ public interface AdminMapper {
+     int deleteByPrimaryKey(String an);
+ 
+     int insert(Admin record);
+ 
++    ArrayList<Admin>selectSelective(Admin admin);
++
++
++
+     int insertSelective(Admin record);
+ 
+     Admin selectByPrimaryKey(String an);
+Index: src/main/resources/sqlmap/AdminMapper.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/sqlmap/AdminMapper.xml	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/resources/sqlmap/AdminMapper.xml	(date 1567777858236)
+@@ -16,6 +16,19 @@
+     from admin
+     where an = #{an,jdbcType=CHAR}
+   </select>
++  <select id="selectSelective" resultMap="BaseResultMap" parameterType="java.lang.String" >
++    select
++    <include refid="Base_Column_List" />
++    from admin
++    <where>
++      <if test="an != null" >
++        an = #{an,jdbcType=CHAR}
++      </if>
++      <if test="password != null" >
++        AND password = #{password,jdbcType=CHAR}
++      </if>
++    </where>
++  </select>
+   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+     delete from admin
+     where an = #{an,jdbcType=CHAR}
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/workspace.xml	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ .idea/workspace.xml	(date 1567859494121)
+@@ -6,152 +6,25 @@
+     </artifacts-to-build>
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="57478353-6daf-442f-8194-dd1f569af3c4" name="Default Changelist" comment="">
+-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/AdminMapper.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/AreaMapper.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/EmployeeMapper.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/SensorDataMapper.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/SpringklerHeadMapper.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/entity/Admin.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/entity/Area.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/entity/Employee.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/entity/SensorData.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/entity/SpringklerHead.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/service/AreaService.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/service/EmployeeService.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AreaServiceImpl.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/EmployeeServiceImpl.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/util/Encryption.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/generator.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/generatorConfig.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/jdbc.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/spring/applicationContext.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/sqlmap/AdminMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/sqlmap/AreaMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/sqlmap/EmployeeMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/sqlmap/SensorDataMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/sqlmap/SpringklerHeadMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_add.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_list.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_update.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/login.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/META-INF/irrigate.kotlin_module" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/controller/areaController.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/controller/empolyeeController.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/dao/AdminMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/dao/AreaMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/dao/EmployeeMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/dao/SensorDataMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/dao/SpringklerHeadMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/entity/Admin.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/entity/Area.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/entity/Employee.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/entity/SensorData.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/entity/SpringklerHead.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/service/AreaService.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/service/EmployeeService.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/service/impl/AreaServiceImpl.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/service/impl/EmployeeServiceImpl.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/com/springmvc/util/Encryption.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/generator.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/generatorConfig.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/jdbc.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/log4j.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/spring/applicationContext.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/sqlmap/AdminMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/sqlmap/AreaMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/sqlmap/EmployeeMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/sqlmap/SensorDataMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/classes/sqlmap/SpringklerHeadMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/META-INF/MANIFEST.MF" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/META-INF/irrigate.kotlin_module" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/controller/areaController.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/controller/empolyeeController.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/AdminMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/AreaMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/EmployeeMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/SensorDataMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/SpringklerHeadMapper.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/entity/Admin.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/entity/Area.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/entity/Employee.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/entity/SensorData.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/entity/SpringklerHead.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/service/AreaService.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/service/EmployeeService.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/service/impl/AreaServiceImpl.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/service/impl/EmployeeServiceImpl.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/util/Encryption.class" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/generator.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/generatorConfig.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/jdbc.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/log4j.properties" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/spring/applicationContext.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/AdminMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/AreaMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/EmployeeMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/SensorDataMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/SpringklerHeadMapper.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/activation-1.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/aopalliance-1.0.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/avalon-framework-4.1.3.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-beanutils-1.8.3.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-codec-1.9.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-collections-3.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-dbcp-1.4.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-fileupload-1.3.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-httpclient-3.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-io-2.4.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-lang-2.4.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-logging-1.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/commons-pool-1.5.6.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/ezmorph-1.0.6.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/jackson-annotations-2.7.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/jackson-core-2.7.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/jackson-databind-2.7.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/json-lib-2.4-jdk15.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/jsr250-api-1.0.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/jstl-1.2.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/log4j-1.2.12.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/logkit-1.0.1.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/mybatis-3.2.4.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/mybatis-spring-1.2.2.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/mysql-connector-java-5.1.29.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/slf4j-api-1.6.6.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/slf4j-log4j12-1.6.6.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-aop-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-beans-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-context-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-context-support-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-core-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-expression-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-jdbc-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-oxm-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-test-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-tx-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-web-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/spring-webmvc-4.2.5.RELEASE.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/lib/standard-1.1.2.jar" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/views/area_add.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/views/area_list.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/views/area_update.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/views/employeeInfo.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/views/login.jsp" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/web.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/target/helloworld/index.jsp" afterDir="false" />
++    <list default="true" id="57478353-6daf-442f-8194-dd1f569af3c4" name="Default Changelist" comment="增加了部分管理功能">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/AdminMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/springmvc/dao/AdminMapper.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/resources/sqlmap/AdminMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sqlmap/AdminMapper.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_list.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_list.jsp" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_login.jsp" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/springmvc/controller/empolyeeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/springmvc/controller/empolyeeController.class" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/springmvc/dao/AdminMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/springmvc/dao/AdminMapper.class" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/sqlmap/AdminMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/sqlmap/AdminMapper.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/controller/empolyeeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/controller/empolyeeController.class" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/AdminMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/com/springmvc/dao/AdminMapper.class" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/AdminMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/helloworld/WEB-INF/classes/sqlmap/AdminMapper.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/helloworld/WEB-INF/views/login.jsp" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/helloworld/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/helloworld/index.jsp" afterDir="false" />
+     </list>
+     <ignored path="$PROJECT_DIR$/out/" />
+     <ignored path="$PROJECT_DIR$/target/" />
+@@ -166,53 +39,11 @@
+   </component>
+   <component name="FileEditorManager">
+     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_add.jsp">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="840">
+-              <caret line="28" column="8" selection-start-line="28" selection-start-column="8" selection-end-line="28" selection-end-column="8" />
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/dao/AreaMapper.java">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="510">
+-              <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+-              <folding>
+-                <element signature="imports" expanded="true" />
+-              </folding>
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="870">
+-              <caret line="36" column="51" selection-start-line="36" selection-start-column="51" selection-end-line="36" selection-end-column="51" />
+-              <folding>
+-                <element signature="imports" expanded="true" />
+-              </folding>
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+-      <file pinned="false" current-in-tab="false">
+-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_update.jsp">
+-          <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="750">
+-              <caret line="25" column="70" selection-start-line="25" selection-start-column="70" selection-end-line="25" selection-end-column="70" />
+-            </state>
+-          </provider>
+-        </entry>
+-      </file>
+       <file pinned="false" current-in-tab="true">
+-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_list.jsp">
++        <entry file="file://$PROJECT_DIR$/src/main/resources/generatorConfig.xml">
+           <provider selected="true" editor-type-id="text-editor">
+-            <state relative-caret-position="71">
+-              <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
++            <state relative-caret-position="240">
++              <caret line="8" column="114" selection-start-line="8" selection-start-column="114" selection-end-line="8" selection-end-column="114" />
+             </state>
+           </provider>
+         </entry>
+@@ -240,26 +71,43 @@
+         <option value="$PROJECT_DIR$/src/main/resources/log4j.properties" />
+         <option value="$PROJECT_DIR$/src/main/resources/spring/applicationContext.xml" />
+         <option value="$PROJECT_DIR$/src/main/resources/generatorConfig.xml" />
+-        <option value="$PROJECT_DIR$/src/main/resources/generator.properties" />
+-        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/dao/EmployeeMapper.java" />
+         <option value="$PROJECT_DIR$/src/main/java/com/springmvc/util/Encryption.java" />
+         <option value="$PROJECT_DIR$/src/main/java/com/springmvc/entity/Employee.java" />
+-        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/EmployeeServiceImpl.java" />
+-        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/EmployeeService.java" />
+-        <option value="$PROJECT_DIR$/src/main/resources/sqlmap/EmployeeMapper.xml" />
+         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/login.jsp" />
+-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp" />
+-        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java" />
+         <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AreaService.java" />
+         <option value="$PROJECT_DIR$/src/main/resources/sqlmap/AreaMapper.xml" />
+         <option value="$PROJECT_DIR$/src/main/java/com/springmvc/dao/AreaMapper.java" />
+-        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AreaServiceImpl.java" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_add.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_update.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_list.jsp" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/AdminService.java" />
++        <option value="$PROJECT_DIR$/src/main/resources/sqlmap/AdminMapper.xml" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_login.jsp" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AdminServiceImpl.java" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/dao/AdminMapper.java" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_change_password.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/initial.jsp" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/controller/initialController.java" />
+         <option value="$PROJECT_DIR$/src/main/webapp/index.jsp" />
+         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
++        <option value="$PROJECT_DIR$/src/main/resources/sqlmap/EmployeeMapper.xml" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/dao/EmployeeMapper.java" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/EmployeeService.java" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/adminInfo.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_update.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_add.jsp" />
+         <option value="$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java" />
+-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_add.jsp" />
+-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_update.jsp" />
+-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_list.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_add.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_list.jsp" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_list.jsp" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AreaServiceImpl.java" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/EmployeeServiceImpl.java" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_update.jsp" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/controller/adminController.java" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp" />
++        <option value="$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java" />
++        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_change_password.jsp" />
++        <option value="$PROJECT_DIR$/src/main/resources/generator.properties" />
+       </list>
+     </option>
+   </component>
+@@ -305,14 +153,15 @@
+     <option name="width" value="1382" />
+     <option name="height" value="744" />
+   </component>
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
++  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
++    <ConfirmationsSetting value="1" id="Add" />
++  </component>
+   <component name="ProjectView">
+     <navigator proportions="" version="1">
+       <foldersAlwaysOnTop value="true" />
+     </navigator>
+     <panes>
+       <pane id="Scope" />
+-      <pane id="PackagesPane" />
+       <pane id="ProjectPane">
+         <subPane>
+           <expand>
+@@ -371,6 +220,15 @@
+               <item name="main" type="462c0819:PsiDirectoryNode" />
+               <item name="java" type="462c0819:PsiDirectoryNode" />
+               <item name="springmvc" type="462c0819:PsiDirectoryNode" />
++              <item name="entity" type="462c0819:PsiDirectoryNode" />
++            </path>
++            <path>
++              <item name="irrigate" type="b2602c69:ProjectViewProjectNode" />
++              <item name="irrigate" type="462c0819:PsiDirectoryNode" />
++              <item name="src" type="462c0819:PsiDirectoryNode" />
++              <item name="main" type="462c0819:PsiDirectoryNode" />
++              <item name="java" type="462c0819:PsiDirectoryNode" />
++              <item name="springmvc" type="462c0819:PsiDirectoryNode" />
+               <item name="service" type="462c0819:PsiDirectoryNode" />
+             </path>
+             <path>
+@@ -443,6 +301,7 @@
+           <select />
+         </subPane>
+       </pane>
++      <pane id="PackagesPane" />
+     </panes>
+   </component>
+   <component name="PropertiesComponent">
+@@ -555,18 +414,28 @@
+       <updated>1567570999082</updated>
+       <workItem from="1567571003734" duration="8745000" />
+       <workItem from="1567641954767" duration="21376000" />
+-      <workItem from="1567728511316" duration="4038000" />
++      <workItem from="1567728511316" duration="5868000" />
++      <workItem from="1567777007579" duration="3895000" />
++      <workItem from="1567816149548" duration="25756000" />
+     </task>
+     <servers />
+   </component>
+   <component name="TimeTrackingManager">
+-    <option name="totallyTimeSpent" value="34159000" />
++    <option name="totallyTimeSpent" value="65640000" />
++  </component>
++  <component name="TodoView">
++    <todo-panel id="selected-file">
++      <is-autoscroll-to-source value="true" />
++    </todo-panel>
++    <todo-panel id="all">
++      <are-packages-shown value="true" />
++      <is-autoscroll-to-source value="true" />
++    </todo-panel>
+   </component>
+   <component name="ToolWindowManager">
+     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+-    <editor active="true" />
+     <layout>
+-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22163388" />
++      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22768533" />
+       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+       <window_info id="Designer" order="2" />
+       <window_info id="Image Layers" order="3" />
+@@ -576,17 +445,17 @@
+       <window_info id="Web" order="7" side_tool="true" />
+       <window_info anchor="bottom" id="Message" order="0" />
+       <window_info anchor="bottom" id="Find" order="1" />
+-      <window_info anchor="bottom" id="Run" order="2" weight="0.42786884" />
++      <window_info anchor="bottom" id="Run" order="2" weight="0.4622951" />
+       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+-      <window_info anchor="bottom" id="TODO" order="6" />
++      <window_info anchor="bottom" id="TODO" order="6" weight="0.3295082" />
+       <window_info anchor="bottom" id="Application Servers" order="7" weight="0.3289689" />
+-      <window_info anchor="bottom" id="Spring" order="8" />
++      <window_info anchor="bottom" id="Spring" order="8" weight="0.3295082" />
+       <window_info anchor="bottom" id="Terminal" order="9" weight="0.3289689" />
+       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
+       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+-      <window_info anchor="bottom" id="Messages" order="12" weight="0.28641573" />
++      <window_info anchor="bottom" id="Messages" order="12" weight="0.2852459" />
+       <window_info anchor="bottom" id="Java Enterprise" order="13" />
+       <window_info anchor="bottom" id="Database Changes" order="14" />
+       <window_info anchor="bottom" id="Version Control" order="15" />
+@@ -601,7 +470,7 @@
+       <window_info anchor="right" id="Theme Preview" order="8" />
+     </layout>
+     <layout-to-restore>
+-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21860817" />
++      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22768533" />
+       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+       <window_info id="Designer" order="2" />
+       <window_info id="Image Layers" order="3" />
+@@ -611,17 +480,17 @@
+       <window_info id="Web" order="7" side_tool="true" />
+       <window_info anchor="bottom" id="Message" order="0" />
+       <window_info anchor="bottom" id="Find" order="1" />
+-      <window_info anchor="bottom" id="Run" order="2" weight="0.2749591" />
++      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.29180327" />
+       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+-      <window_info anchor="bottom" id="TODO" order="6" />
++      <window_info anchor="bottom" id="TODO" order="6" weight="0.3295082" />
+       <window_info anchor="bottom" id="Application Servers" order="7" weight="0.3289689" />
+-      <window_info anchor="bottom" id="Spring" order="8" />
++      <window_info anchor="bottom" id="Spring" order="8" weight="0.3295082" />
+       <window_info anchor="bottom" id="Terminal" order="9" weight="0.3289689" />
+       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
+       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+-      <window_info anchor="bottom" id="Messages" order="12" weight="0.28641573" />
++      <window_info anchor="bottom" id="Messages" order="12" weight="0.2852459" />
+       <window_info anchor="bottom" id="Java Enterprise" order="13" />
+       <window_info anchor="bottom" id="Database Changes" order="14" />
+       <window_info anchor="bottom" id="Version Control" order="15" />
+@@ -639,6 +508,10 @@
+   <component name="TypeScriptGeneratedFilesManager">
+     <option name="version" value="1" />
+   </component>
++  <component name="VcsManagerConfiguration">
++    <MESSAGE value="增加了部分管理功能" />
++    <option name="LAST_COMMIT_MESSAGE" value="增加了部分管理功能" />
++  </component>
+   <component name="antWorkspaceConfiguration">
+     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+     <option name="FILTER_TARGETS" value="false" />
+@@ -665,201 +538,347 @@
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/resources/generatorConfig.xml">
++    <entry file="file://$PROJECT_DIR$/../spring例子/HTML+CSS+JavaScript前端开发（慕课版）-源代码/源码/第4章/4-1/css/mr-style.css">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="150">
++          <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/entity/Employee.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="1020">
++          <caret line="54" column="18" selection-start-line="54" selection-start-column="18" selection-end-line="54" selection-end-column="18" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/resources/sqlmap/AreaMapper.xml">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="-1223">
++          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/AreaService.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="240">
+-          <caret line="8" column="114" selection-start-line="8" selection-start-column="114" selection-end-line="8" selection-end-column="114" />
++        <state relative-caret-position="171">
++          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
++          <folding>
++            <element signature="imports" expanded="true" />
++          </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/resources/generator.properties">
++    <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-impl.jar!/resources/html5-schema/html5/web-forms.rnc">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="405">
+-          <caret line="15" column="17" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
++        <state relative-caret-position="139">
++          <caret line="497" column="22" selection-start-line="497" selection-start-column="22" selection-end-line="497" selection-end-column="22" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/util/Encryption.java">
++    <entry file="file://$PROJECT_DIR$/src/main/resources/spring/applicationContext.xml">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="210">
+-          <caret line="7" column="16" selection-start-line="7" selection-start-column="16" selection-end-line="7" selection-end-column="16" />
++        <state relative-caret-position="-600">
++          <caret line="13" column="15" lean-forward="true" selection-start-line="13" selection-start-column="15" selection-end-line="13" selection-end-column="15" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/../spring例子/HTML+CSS+JavaScript前端开发（慕课版）-源代码/源码/第4章/4-1/css/mr-style.css">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/dao/AreaMapper.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="297">
++          <caret line="20" selection-start-line="7" selection-end-line="20" />
++          <folding>
++            <element signature="imports" expanded="true" />
++          </folding>
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/dao/AdminMapper.java">
+       <provider selected="true" editor-type-id="text-editor">
+         <state relative-caret-position="150">
+-          <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
++          <caret line="13" selection-start-line="13" selection-end-line="13" />
++          <folding>
++            <element signature="imports" expanded="true" />
++          </folding>
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/entity/Admin.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="166">
++          <caret line="11" column="25" lean-forward="true" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
++          <folding>
++            <element signature="e#187#188#0" expanded="true" />
++            <element signature="e#212#213#0" expanded="true" />
++            <element signature="e#441#442#0" expanded="true" />
++            <element signature="e#472#473#0" expanded="true" />
++          </folding>
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/util/Encryption.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="30">
++          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/entity/Employee.java">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_change_password.jsp">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="1020">
+-          <caret line="54" column="18" selection-start-line="54" selection-start-column="18" selection-end-line="54" selection-end-column="18" />
++        <state relative-caret-position="22">
++          <caret line="29" column="30" lean-forward="true" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/dao/EmployeeMapper.java">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AdminServiceImpl.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="201">
+-          <caret line="11" column="48" selection-start-line="11" selection-start-column="48" selection-end-line="11" selection-end-column="48" />
++        <state relative-caret-position="-297">
++          <caret line="19" column="59" selection-start-line="19" selection-start-column="59" selection-end-line="19" selection-end-column="59" />
+           <folding>
+             <element signature="imports" expanded="true" />
++            <element signature="e#615#616#0" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/resources/sqlmap/EmployeeMapper.xml">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_login.jsp">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="127">
+-          <caret line="28" column="43" selection-start-line="28" selection-start-column="43" selection-end-line="28" selection-end-column="43" />
++        <state relative-caret-position="-60">
++          <caret line="11" column="7" lean-forward="true" selection-start-line="11" selection-start-column="7" selection-end-line="11" selection-end-column="7" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_login.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="60">
++          <caret line="17" column="34" lean-forward="true" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/initial.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="232">
++          <caret line="17" column="62" selection-start-line="17" selection-start-column="62" selection-end-line="17" selection-end-column="62" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/index.jsp">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="480">
+-          <caret line="16" column="61" selection-start-line="16" selection-start-column="61" selection-end-line="16" selection-end-column="61" />
++        <state relative-caret-position="90">
++          <caret line="3" column="58" selection-start-line="3" selection-start-column="58" selection-end-line="3" selection-end-column="58" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/resources/sqlmap/AreaMapper.xml">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="-1223">
+-          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
++        <state relative-caret-position="150">
++          <caret line="57" column="33" selection-start-line="57" selection-start-column="33" selection-end-line="57" selection-end-column="33" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/AreaService.java">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/initialController.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="171">
+-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
++        <state relative-caret-position="230">
++          <caret line="8" column="29" selection-start-line="8" selection-start-column="29" selection-end-line="8" selection-end-column="29" />
+           <folding>
+             <element signature="imports" expanded="true" />
++            <element signature="e#165#166#0" expanded="true" />
++            <element signature="e#189#190#0" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/EmployeeServiceImpl.java">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/AdminService.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="870">
+-          <caret line="33" column="5" lean-forward="true" selection-start-line="33" selection-start-column="5" selection-end-line="33" selection-end-column="5" />
++        <state relative-caret-position="254">
++          <caret line="10" column="21" selection-start-line="10" selection-start-column="21" selection-end-line="10" selection-end-column="21" />
+           <folding>
+             <element signature="imports" expanded="true" />
+-            <element signature="e#964#965#0" expanded="true" />
+-            <element signature="e#985#986#0" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/EmployeeService.java">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="231">
+-          <caret line="9" column="34" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
++        <state relative-caret-position="290">
++          <caret line="43" column="25" lean-forward="true" selection-start-line="43" selection-start-column="25" selection-end-line="43" selection-end-column="25" />
+           <folding>
+             <element signature="imports" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AreaServiceImpl.java">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_add.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="240">
++          <caret line="26" column="67" selection-start-line="26" selection-start-column="67" selection-end-line="26" selection-end-column="67" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/../spring例子/SSM整合开发源代码/oa/oa_biz/src/main/java/com/imooc/oa/biz/EmployeeBiz.java">
++      <provider selected="true" editor-type-id="text-editor" />
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_list.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="30">
++          <caret line="34" column="24" lean-forward="true" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="28" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/EmployeeService.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="270">
+-          <caret line="10" column="8" selection-start-line="10" selection-start-column="8" selection-end-line="10" selection-end-column="8" />
++        <state relative-caret-position="127">
++          <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
+           <folding>
+             <element signature="imports" expanded="true" />
+-            <element signature="e#448#449#0" expanded="true" />
+-            <element signature="e#499#500#0" expanded="true" />
+-            <element signature="e#536#537#0" expanded="true" />
+-            <element signature="e#585#586#0" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/index.jsp">
++    <entry file="file://$PROJECT_DIR$/src/main/resources/sqlmap/AdminMapper.xml">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="90">
+-          <caret line="3" column="53" selection-start-line="3" selection-start-column="53" selection-end-line="3" selection-end-column="53" />
++        <state relative-caret-position="-1320">
++          <caret line="27" column="33" lean-forward="true" selection-start-line="27" selection-start-column="33" selection-end-line="27" selection-end-column="33" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/login.jsp">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/dao/EmployeeMapper.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="90">
+-          <caret line="9" selection-start-line="9" selection-end-line="11" selection-end-column="7" />
++        <state relative-caret-position="172">
++          <caret line="22" column="8" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="8" />
++          <folding>
++            <element signature="imports" expanded="true" />
++          </folding>
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/AreaServiceImpl.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="322">
++          <caret line="20" column="47" selection-start-line="20" selection-start-column="47" selection-end-line="20" selection-end-column="47" />
++          <folding>
++            <element signature="imports" expanded="true" />
++          </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/service/impl/EmployeeServiceImpl.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="199">
+-          <caret line="28" column="23" lean-forward="true" selection-start-line="28" selection-start-column="23" selection-end-line="28" selection-end-column="23" />
++        <state relative-caret-position="200">
++          <caret line="40" column="42" selection-start-line="40" selection-start-column="42" selection-end-line="40" selection-end-column="42" />
+           <folding>
+             <element signature="imports" expanded="true" />
++            <element signature="e#1059#1060#0" expanded="true" />
++            <element signature="e#1110#1111#0" expanded="true" />
++            <element signature="e#1147#1148#0" expanded="true" />
++            <element signature="e#1192#1193#0" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-impl.jar!/resources/html5-schema/html5/web-forms.rnc">
++    <entry file="file://$PROJECT_DIR$/src/main/resources/sqlmap/EmployeeMapper.xml">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="139">
+-          <caret line="497" column="22" selection-start-line="497" selection-start-column="22" selection-end-line="497" selection-end-column="22" />
++        <state relative-caret-position="-1994">
++          <caret line="22" column="17" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/resources/spring/applicationContext.xml">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin_area_update.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="-150">
++          <caret line="12" column="38" lean-forward="true" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_add.jsp">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="-600">
+-          <caret line="13" column="15" lean-forward="true" selection-start-line="13" selection-start-column="15" selection-end-line="13" selection-end-column="15" />
++        <state relative-caret-position="90">
++          <caret line="33" column="61" selection-start-line="33" selection-start-column="61" selection-end-line="33" selection-end-column="61" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_list.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="20">
++          <caret line="53" column="42" selection-start-line="53" selection-start-column="42" selection-end-line="53" selection-end-column="42" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_update.jsp">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="231">
+-          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
++        <state relative-caret-position="186">
++          <caret line="32" column="42" selection-start-line="32" selection-start-column="42" selection-end-line="32" selection-end-column="42" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_add.jsp">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/adminInfo.jsp">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="840">
+-          <caret line="28" column="8" selection-start-line="28" selection-start-column="8" selection-end-line="28" selection-end-column="8" />
++        <state relative-caret-position="66">
++          <caret line="18" column="87" lean-forward="true" selection-start-line="18" selection-start-column="12" selection-end-line="18" selection-end-column="87" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/dao/AreaMapper.java">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/adminController.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="510">
+-          <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
++        <state relative-caret-position="-330">
++          <caret line="56" column="23" selection-start-line="56" selection-start-column="23" selection-end-line="56" selection-end-column="23" />
+           <folding>
+             <element signature="imports" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/areaController.java">
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employeeInfo.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="240">
++          <caret line="23" column="72" selection-start-line="23" selection-start-column="72" selection-end-line="23" selection-end-column="72" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/employee_change_password.jsp">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="192">
++          <caret line="27" column="78" selection-start-line="27" selection-start-column="78" selection-end-line="27" selection-end-column="78" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/controller/empolyeeController.java">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="870">
+-          <caret line="36" column="51" selection-start-line="36" selection-start-column="51" selection-end-line="36" selection-end-column="51" />
++        <state relative-caret-position="562">
++          <caret line="75" column="67" selection-start-line="75" selection-start-column="67" selection-end-line="75" selection-end-column="67" />
+           <folding>
+             <element signature="imports" expanded="true" />
++            <element signature="e#2566#2567#0" expanded="true" />
++            <element signature="e#2612#2613#0" expanded="true" />
+           </folding>
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_update.jsp">
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/entity/SpringklerHead.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="300">
++          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/java/com/springmvc/entity/SensorData.java">
++      <provider selected="true" editor-type-id="text-editor">
++        <state relative-caret-position="30">
++          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
++        </state>
++      </provider>
++    </entry>
++    <entry file="file://$PROJECT_DIR$/src/main/resources/generator.properties">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="750">
+-          <caret line="25" column="70" selection-start-line="25" selection-start-column="70" selection-end-line="25" selection-end-column="70" />
++        <state relative-caret-position="404">
++          <caret line="15" column="21" selection-start-line="15" selection-start-column="21" selection-end-line="15" selection-end-column="21" />
+         </state>
+       </provider>
+     </entry>
+-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/area_list.jsp">
++    <entry file="file://$PROJECT_DIR$/src/main/resources/generatorConfig.xml">
+       <provider selected="true" editor-type-id="text-editor">
+-        <state relative-caret-position="71">
+-          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
++        <state relative-caret-position="240">
++          <caret line="8" column="114" selection-start-line="8" selection-start-column="114" selection-end-line="8" selection-end-column="114" />
+         </state>
+       </provider>
+     </entry>
+Index: target/helloworld/WEB-INF/classes/sqlmap/AdminMapper.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- target/helloworld/WEB-INF/classes/sqlmap/AdminMapper.xml	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ target/helloworld/WEB-INF/classes/sqlmap/AdminMapper.xml	(date 1567777858236)
+@@ -16,6 +16,19 @@
+     from admin
+     where an = #{an,jdbcType=CHAR}
+   </select>
++  <select id="selectSelective" resultMap="BaseResultMap" parameterType="java.lang.String" >
++    select
++    <include refid="Base_Column_List" />
++    from admin
++    <where>
++      <if test="an != null" >
++        an = #{an,jdbcType=CHAR}
++      </if>
++      <if test="password != null" >
++        AND password = #{password,jdbcType=CHAR}
++      </if>
++    </where>
++  </select>
+   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+     delete from admin
+     where an = #{an,jdbcType=CHAR}
+Index: src/main/webapp/WEB-INF/views/login.jsp
+===================================================================
+--- src/main/webapp/WEB-INF/views/login.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/webapp/WEB-INF/views/employee_login.jsp	(date 1567646651019)
+Index: src/main/webapp/WEB-INF/views/employeeInfo.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/webapp/WEB-INF/views/employeeInfo.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/webapp/WEB-INF/views/employeeInfo.jsp	(date 1567846714210)
+@@ -1,3 +1,4 @@
++<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+ <%--
+   Created by IntelliJ IDEA.
+   User: 牛萌
+@@ -12,13 +13,16 @@
+ </head>
+ <body>
+ <div>
+-    <c:if test="${not empty user}">
+-    <div>欢迎您，${user.name}${user.sex?'女士':'先生'}
+-        <a href="${pageContext.request.contextPath}/index.jsp">注销</a></div></div>
+-</c:if>
+-<c:if test="${ empty user}">
+-    对不起，请先<a href="${pageContext.request.contextPath}/employee/login">登录</a>
+-</c:if>
++    <c:if test="${not empty employee}">
++        <div>欢迎您，${employee.name}先生
++            <a href="${pageContext.request.contextPath}/employee/logout">注销</a>
++            <a href="${pageContext.request.contextPath}/employee/change_password">修改密码</a>
++            <a href="${pageContext.request.contextPath}/employee/login">切换用户</a>
++        </div>
++    </c:if>
++    <c:if test="${empty employee}">
++        对不起，请先<a href="${pageContext.request.contextPath}/employee/login">登陆</a>
++    </c:if>
+ </div>
+ </body>
+ </html>
+Index: src/main/java/com/springmvc/controller/empolyeeController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/springmvc/controller/empolyeeController.java	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ src/main/java/com/springmvc/controller/empolyeeController.java	(date 1567847002456)
+@@ -11,7 +11,6 @@
+ import org.springframework.web.bind.annotation.RequestMethod;
+ import org.springframework.web.bind.annotation.RequestParam;
+ 
+-import javax.annotation.Resource;
+ import javax.servlet.http.HttpSession;
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -26,7 +25,7 @@
+ 
+     @RequestMapping(value = "/employee/login",method = RequestMethod.GET)
+     public String login(){
+-        return "login";
++        return "employee_login";
+     }
+ 
+     @RequestMapping(value = "/emloyee/login",method = RequestMethod.POST)
+@@ -39,19 +38,24 @@
+             model.addAttribute("status",1);
+         }else {
+             record.setPassword(Encryption.MD5(employee.getPassword()));
++//            System.out.println(record.getEn());
++//            System.out.println(record.getPassword());
++            list = employeeService.selectSelective(record);
++//            System.out.println(list.size());
+             if (list.size() == 0){
+                 model.addAttribute("status",2);
+-            }
+-            record = list.get(0);
+-            session.setAttribute("employee",record);
+-            model.addAttribute("status",0);
++            }else {
++                record = list.get(0);
++                session.setAttribute("employee",record);
++                model.addAttribute("status",0);
++            }
+         }
+-        return "login";
++        return "employee_login";
+     }
+     @RequestMapping(value = "/employee/logout", method = RequestMethod.GET)
+     public String logout(HttpSession session){
+         session.invalidate();
+-        return "login";
++        return "initial";
+     }
+ 
+     @RequestMapping(value = "/employee/employeeInfo",method = RequestMethod.GET)
+@@ -62,5 +66,61 @@
+         }
+         return "employeeInfo";
+     }
++    @RequestMapping(value = "/employee/change_password",method = RequestMethod.GET)
++    public String toChangePassword(){
++        return "employee_change_password";
++    }
+ 
++    @RequestMapping(value = "/employee/change_password",method = RequestMethod.POST)
++    public String changePassword(HttpSession session, Model model, @ModelAttribute Employee employee, @RequestParam String new1, @RequestParam String new2){
++        Employee record = (Employee) session.getAttribute("employee");
++        record.setPassword(Encryption.MD5(employee.getPassword()));
++//        System.out.println(record.getPassword()+"密码获得");
++        List<Employee> list = employeeService.selectSelective(record);
++//        System.out.println(list.size()+"有密码");
++        if (list.size() == 0){
++            model.addAttribute("status",2);
++        }else {
++            if (new1.equals(new2)){
++                record.setPassword(Encryption.MD5(new1));
++                employeeService.changePassword(record);
++                model.addAttribute("status",1);
++            }else {
++                model.addAttribute("status",0);
++            }
++        }
++        return "employee_change_password";
++    }
++
++    //员工列表
++    @RequestMapping(value = "/employee/list")
++    public String list(Map<String,Object> map){
++        map.put("list",employeeService.getAll());
++        return "employee_list";
++    }
++    @RequestMapping("/employee/to_add")
++    public String toAdd(Map<String,Object>map){
++        map.put("employee",new Employee());
++        return "employee_add";
++    }
++    @RequestMapping("/employee/add")
++    public String add(Employee employee){
++        employeeService.add(employee);
++        return "redirect:/employee/list";
++    }
++    @RequestMapping("/employee/to_update")
++    public String toUpdate(String en,Map<String,Object>map){
++        map.put("employee",employeeService.get(en));
++        return "employee_update";
++    }
++    @RequestMapping("/employee/update")
++    public String update(Employee employee){
++        employeeService.edit(employee);
++        return "redirect:/employee/list";
++    }
++    @RequestMapping(value = "/employee/remove",params = "en")
++    public String remove(String en){
++        employeeService.remove(en);
++        return "redirect:/employee/list";
++    }
+ }
+Index: target/helloworld/index.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- target/helloworld/index.jsp	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ target/helloworld/index.jsp	(date 1567827939205)
+@@ -1,6 +1,6 @@
+ <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+ <html>
+ <body>
+-<a href="${pageContext.request.contextPath}/area/list">员工登陆</a>
++<a href="${pageContext.request.contextPath}/initial">进入主界面</a>
+ </body>
+ </html>
+Index: target/classes/sqlmap/AdminMapper.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- target/classes/sqlmap/AdminMapper.xml	(revision 32998409e09bb8c40a59724209740f2203e38d69)
++++ target/classes/sqlmap/AdminMapper.xml	(date 1567777858236)
+@@ -16,6 +16,19 @@
+     from admin
+     where an = #{an,jdbcType=CHAR}
+   </select>
++  <select id="selectSelective" resultMap="BaseResultMap" parameterType="java.lang.String" >
++    select
++    <include refid="Base_Column_List" />
++    from admin
++    <where>
++      <if test="an != null" >
++        an = #{an,jdbcType=CHAR}
++      </if>
++      <if test="password != null" >
++        AND password = #{password,jdbcType=CHAR}
++      </if>
++    </where>
++  </select>
+   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+     delete from admin
+     where an = #{an,jdbcType=CHAR}
+diff --git target/helloworld/WEB-INF/classes/com/springmvc/dao/AdminMapper.class target/helloworld/WEB-INF/classes/com/springmvc/dao/AdminMapper.class
+index 5d86efe12f0d3354ffb3abb75d022e4f9c405868..4c5dabec2ed9318e98686cb37fd1dc87963c234c
+GIT binary patch
+literal 582
+zc$}3`%SyyB6g?To))^litFA=cjvJ%Qazq#xf>=@M7sNJ{41JNNh5nigKfsR?({#WV
+zrC=60+?;dIxw)TT?;ilJacsl2aYW#TJm!ku)h|*cOxBOQCODaUYgREDvoxZ<k|K?k
+z7Y_uMNDD3%!TH<^vV<0SLnT!}d8&k}=_*V_YNSq~eFNp2TU4B2G2GK8mP*8QB_*pp
+zQK%)s#1~P@R4KK?>;D~YhB|JwzteuHGpE~5-rva8UmF?nCO9qgko7m)P5I3dO#Q5s
+z0lycqR?Lji6U%chFPm_JvwmR6GTIU8mY*4)-_|<HA|M!{Irf-f3u8dzHY|fSb~HcH
+Z><Cj`?{41ruy62SQ#%c6<;*A#zXANCsssQ4
+
+diff --git target/helloworld/WEB-INF/classes/com/springmvc/controller/empolyeeController.class target/helloworld/WEB-INF/classes/com/springmvc/controller/empolyeeController.class
+index 0d5adf285a4c2d9a37fee759ce5777b71327d716..043f53a96ce1595357ad4d4ff9b44099a7093034
+GIT binary patch
+literal 5662
+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
+
+diff --git target/classes/com/springmvc/dao/AdminMapper.class target/classes/com/springmvc/dao/AdminMapper.class
+index 5d86efe12f0d3354ffb3abb75d022e4f9c405868..4c5dabec2ed9318e98686cb37fd1dc87963c234c
+GIT binary patch
+literal 582
+zc$}3`%SyyB6g?To))^litFA=cjvJ%Qazq#xf>=@M7sNJ{41JNNh5nigKfsR?({#WV
+zrC=60+?;dIxw)TT?;ilJacsl2aYW#TJm!ku)h|*cOxBOQCODaUYgREDvoxZ<k|K?k
+z7Y_uMNDD3%!TH<^vV<0SLnT!}d8&k}=_*V_YNSq~eFNp2TU4B2G2GK8mP*8QB_*pp
+zQK%)s#1~P@R4KK?>;D~YhB|JwzteuHGpE~5-rva8UmF?nCO9qgko7m)P5I3dO#Q5s
+z0lycqR?Lji6U%chFPm_JvwmR6GTIU8mY*4)-_|<HA|M!{Irf-f3u8dzHY|fSb~HcH
+Z><Cj`?{41ruy62SQ#%c6<;*A#zXANCsssQ4
+
+diff --git target/classes/com/springmvc/controller/empolyeeController.class target/classes/com/springmvc/controller/empolyeeController.class
+index 0d5adf285a4c2d9a37fee759ce5777b71327d716..043f53a96ce1595357ad4d4ff9b44099a7093034
+GIT binary patch
+literal 5662
+zc$~FY`F|6~9eu0Y^2!()8<ar85kO#!LWl{mDPXVzPR&uw5uhnu%WHdyq!qg>J5Ffb
+zrbp5=J=3%$rB`~Scat^+99o)Q`JsPQKYcU1UTJ070{ZDMJEPf|@Atj;eKR}y_kZ5M
+z17H_EOd^X)0@HEKBoRg>j^~qzq9Pu%;_*TYw&KNBT*aqa@oCH@@R=k&i<esQIecDB
+z_(Bq2#LJ@hikR@F1P-<0ReV`IUQ6IBqWx+DClmNu5?{wRM5u2jFeuvBTk$Qtk-)bT
+z_>TDf-2|?Q_RR#oC)(@c@%=b{5XTP{tk8?)f;p?}qq;S1<aGsGNAhMdXO}IbG+CU^
+z=WO>yZYVghUqR+nrQ{ez{j6adV+DPnR5BgSG0c*!VDE@&O?pu#EUl=|nAUT-F<mR!
+zxd|=rnAU7g^B3d>Dvmj0So%1_#`YN{!`ZJOoZWU-LFBMGPFO2OjFNu5QXJE*(;BlW
+zNROC#t#DSe4Ds6=j5t#U)A!Vo$eSg{G7AOW%8{^HAdkcT5OYQg=A=<luqwN4<gzxc
+z<qBG9GB@go_5Dk+nbF5`V@7GbmdGjnN=3JwV_LcFE{#rWg^IwRTTnXZ<%$(`XUZH`
+z@WeewmkSv@d}Qdff|Lw+Rx23en!{9AvXaB|vUCOA$xS&<Id_zgQQfu~r@vvsijg};
+zsSEve+UYE^GwavCzo9~L+YPN?eY51$q$u(zcxZVX3K9#NDR{UEDwe)r*p7mB7hc6N
+z3b_%E2uE3Z-n6K6SI{!E<pta9s#~<LNw)or+Qy0o3K}_iVwC0B7~B>oHNni$t-IJC
+zjcP8n7;q@`Sj7=MV@zjO$n^21b#7Ry_J9**Bz0kAxHMrZIF)T;ko!s7RZSbr*6x^x
+zr#O{L+4hXAQ>HpMFJE0M`|sNFb(7!t|Jr>qm&GFu2}er$%r0?EE%EL#1$*vw=Swqj
+z{ibY<VR_gzMi4G)WpQ!_rz+?Tj_g~O;)$`#dft(aZy7ZvOPW)$xMPO1_Z6fe&bAsy
+z$~_!)%z^RofK?syk|u`2^0_;EKZjJR8cs$@IOdtMduH}#m%_ii#37v<|6<d{|BE^u
+z0TC)5;MhW^MkD{7r5DX<cD6JC*6d7JSQ{$~ukol#j+zxKuRmpogL3ua&*x4NPeFG>
+zFWWr$bkpHUo2&WYs_4N^)_o!ACGQ07sERgVS=#J~bi=x3OReHZ=vDD!yrp6rw#V@k
+z6+gw#;`q6WxA6-SvAKsTb{xM{@hki~j^C*GEq<rs_vnq|9To4wRPhI~{*QPsjz6im
+zftxCB35aoV7csPgig~=RV2zKs?p%uFwu(RFFDlO9j*7qHgE;=C;_vteZC9l!`S_=;
+zaI}hX+@Y?#`|$pgclv^RL16l4%{9%dzlwi}G$p)6;qT$9!%ElNj=ODAcZR5b)OOp>
+zMy}yaZ1Y`R3<=iO3k*CepN8<#p1a(x!ODx1A^2J5!D$;W=<;eftYBpo=5Wc;Ck4N_
+zyl<VD;0Gr=T<djj27|6$?sLHMuqyudR>9zso4a=JZfkaxX{E^3Z&sb9CBdOm-kL2t
+z@)8w3HrUHGcI}!lBZ%SzSb6Drms<WCNLmb5Lu>2Z(PG(?Mrqo=TdI?RD9sKSA6|R?
+zH111&(zJqI=eLE#7kH6s>KdYp2|xvwEuF13k>{UO;1s5YWpUlv+aO`1k~ZM6yCLDG
+zS5t0o2OIdWFU!A({A!4kifuQ4#n|p(n_|mTk<T1|<=850quXynd6%6K9`z;ztN1Sy
+zP~8c547+8}$I;7KVsVeRIGhf>Q@3<&&C;;9RG?VHkv*LG#6>7J_TovlI{MJh@qPFR
+z=Q6OepKXk@uir-a{7ppqBDWD`C)O9uM0;)^eglc^@1Z3Vokuc+zDOoAk5&b5qGLx|
+zjod<N9&KTqdm9(z{1vy*egi9)UJ|WYvNaP4&m$ee2Z;7XyVD(F$*M3oE$mNo8HXj~
+zKD6<<0WH{wG&bQuJVO09ll2xHV(&PaU!+(%Rj+WxOVs8yzP&~vg-ZKfuAWMww;u<j
+za@TPX15``&4&gBKwcvFOVh9mtdKFJ`EQ%wZ((b#Xe79KXVPEN|@ln2Q4a-ytM&$Dt
+zLAo^^khTF@y64eJw|7-5o0Kn}B-%cSyUU&E<8JYAFV21<Q0J5Qn3wDd8AaHx+mY^=
+z$7(70@tzNnqUt@K&}*sy(sJ?vl0AraB7K1L1(5A-5Ff}oDVrjD0#b-8R(b+126rj|
+zZnS~BGxhF1a#!v?9SD2|XFYdsW1HaYx$Y|KzE~z!XVjQ$)OaSogi#M<BAMt7Ja7%!
+zOe_-#E`2bBx~<S2G;pSB;GJmYbA(63F=SY*EiBNZ)a4*4JWb%I3H=hz!Nhr7#m6Q2
+zQ!WKx^EuzNbG~WkJk3S#9G;O?nq!P-XxbDkY2O&LotKu5`$l$0j&fu<QC%aijs}c;
+zq2@WrT_+VM_^<@j*_~c11e(V>g%_=dgboi^b#M(nMxW(t4BqK;>?HSR8F&GwJMszk
+zE=hxYQsQlscoh$?#@?6@<XLJUVs^0f-jU|PSYHogk`|w;fzjc^=vV}!qbZC$d*eKT
+zTx$=p6){sn3~uxdA*46fZ}bA&Vhw<l4<IG$sx(M5!QLccyKFC$t*Cw%x3`yRQ)of=
+zN9qY*Aq`9BTko#&^L4?XXB62J)I&AYyCn6HNBwdGOwX}bSd#kYM%1U-&fFvQB6}rn
+lk;ZAZG)nU#+p9~YaT#~ZceVa6<BDtzj#x6D?SI}K;J^N8b~69~
+

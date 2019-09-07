@@ -2,6 +2,8 @@ package com.springmvc.dao;
 
 import com.springmvc.entity.SensorData;
 
+import java.util.List;
+
 public interface SensorDataMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,6 @@ public interface SensorDataMapper {
     int updateByPrimaryKeySelective(SensorData record);
 
     int updateByPrimaryKey(SensorData record);
+
+    List<SensorData> selectAll();
 }
