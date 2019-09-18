@@ -137,7 +137,7 @@ public class empolyeeController {
     }
     @ResponseBody
     @RequestMapping(value = "/changePassword",produces = "application/json;charset=utf-8")
-    public String chenge(HttpSession session, @RequestParam("en") String en,@RequestParam("password") String password, @RequestParam("newPassword") String new1){
+    public String change(HttpSession session, @RequestParam("en") String en,@RequestParam("password") String password, @RequestParam("newPassword") String new1){
 /*      第二种获取android客户端传递值的方式：
         String userName=request.getParameter("userName");
         String password=request.getParameter("password");*/
