@@ -4,14 +4,15 @@
   <resultMap id="BaseResultMap" type="com.springmvc.entity.SensorData" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="direction" property="direction" jdbcType="INTEGER" />
-    <result column="springkler_s_id" property="springklerSId" jdbcType="INTEGER" />
+    <result column="springkler_id" property="springklerId" jdbcType="INTEGER" />
+    <result column="location" property="location" jdbcType="CHAR" />
     <result column="r_time" property="rTime" jdbcType="TIMESTAMP" />
     <result column="t_data" property="tData" jdbcType="CHAR" />
     <result column="h_data" property="hData" jdbcType="CHAR" />
     <result column="s_data" property="sData" jdbcType="CHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, direction, springkler_s_id, r_time, t_data, h_data, s_data
+    id, direction, springkler_id, location, r_time, t_data, h_data, s_data
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -24,17 +25,70 @@
     <include refid="Base_Column_List" />
     from sensor_data
   </select>
+  <select id="selectList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from sensor_data
+    <where>
+      id = (select MAX(id) from sensor_data where location = #{location,jdbcType=CHAR} AND springkler_id = #{springklerId,jdbcType=INTEGER} AND direction = #{direction,jdbcType=INTEGER})
+<!--    <if test="direction != null" >-->
+<!--        AND direction = #{direction,jdbcType=INTEGER}-->
+<!--    </if>-->
+<!--      <if test="springklerId != null" >-->
+<!--        AND springkler_id = #{springklerId,jdbcType=INTEGER}-->
+<!--      </if>-->
+<!--      <if test="location != null" >-->
+<!--        AND location = #{location,jdbcType=CHAR}-->
+<!--      </if>-->
+<!--      <if test="direction !=null">-->
+<!--        AND direction = #{direction,jdbcType=INTEGER}-->
+<!--      </if>-->
+    </where>
+  </select>
+  <select id="selectNumber" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+      select
+      <include refid="Base_Column_List" />
+      from sensor_data
+      <where>
+         (location = #{location,jdbcType=CHAR} AND springkler_id = #{springklerId,jdbcType=INTEGER} AND direction = #{direction,jdbcType=INTEGER})
+      </where>
+       order by id desc limit 8
+  </select>
+  <select id="findBytData" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select r_time ,t_data
+    from sensor_data
+    <where>
+      <if test="direction != null" >
+        direction = #{direction}
+      </if>
+      <if test="springklerId != null" >
+        AND springkler_id = #{springklerId}
+      </if>
+    </where>
+  </select>
+  <select id="findByhData" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select r_time ,h_data
+    from sensor_data
+    <where>
+      <if test="direction != null" >
+        direction = #{direction}
+      </if>
+      <if test="springklerId != null" >
+        AND springkler_id = #{springklerId}
+      </if>
+    </where>
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from sensor_data
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.springmvc.entity.SensorData" >
-    insert into sensor_data (id, direction, springkler_s_id, 
-      r_time, t_data, h_data, s_data
-      )
-    values (#{id,jdbcType=INTEGER}, #{direction,jdbcType=INTEGER}, #{springklerSId,jdbcType=INTEGER}, 
-      #{rTime,jdbcType=TIMESTAMP}, #{tData,jdbcType=CHAR}, #{hData,jdbcType=CHAR}, #{sData,jdbcType=CHAR}
-      )
+    insert into sensor_data (id, direction, springkler_id, 
+      location, r_time, t_data, 
+      h_data, s_data)
+    values (#{id,jdbcType=INTEGER}, #{direction,jdbcType=INTEGER}, #{springklerId,jdbcType=INTEGER}, 
+      #{location,jdbcType=CHAR}, #{rTime,jdbcType=TIMESTAMP}, #{tData,jdbcType=CHAR}, 
+      #{hData,jdbcType=CHAR}, #{sData,jdbcType=CHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.springmvc.entity.SensorData" >
     insert into sensor_data
@@ -45,8 +99,11 @@
       <if test="direction != null" >
         direction,
       </if>
-      <if test="springklerSId != null" >
-        springkler_s_id,
+      <if test="springklerId != null" >
+        springkler_id,
+      </if>
+      <if test="location != null" >
+        location,
       </if>
       <if test="rTime != null" >
         r_time,
@@ -68,8 +125,11 @@
       <if test="direction != null" >
         #{direction,jdbcType=INTEGER},
       </if>
-      <if test="springklerSId != null" >
-        #{springklerSId,jdbcType=INTEGER},
+      <if test="springklerId != null" >
+        #{springklerId,jdbcType=INTEGER},
+      </if>
+      <if test="location != null" >
+        #{location,jdbcType=CHAR},
       </if>
       <if test="rTime != null" >
         #{rTime,jdbcType=TIMESTAMP},
@@ -91,8 +151,11 @@
       <if test="direction != null" >
         direction = #{direction,jdbcType=INTEGER},
       </if>
-      <if test="springklerSId != null" >
-        springkler_s_id = #{springklerSId,jdbcType=INTEGER},
+      <if test="springklerId != null" >
+        springkler_id = #{springklerId,jdbcType=INTEGER},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=CHAR},
       </if>
       <if test="rTime != null" >
         r_time = #{rTime,jdbcType=TIMESTAMP},
@@ -112,7 +175,8 @@
   <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.SensorData" >
     update sensor_data
     set direction = #{direction,jdbcType=INTEGER},
-      springkler_s_id = #{springklerSId,jdbcType=INTEGER},
+      springkler_id = #{springklerId,jdbcType=INTEGER},
+      location = #{location,jdbcType=CHAR},
       r_time = #{rTime,jdbcType=TIMESTAMP},
       t_data = #{tData,jdbcType=CHAR},
       h_data = #{hData,jdbcType=CHAR},

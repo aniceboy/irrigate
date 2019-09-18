@@ -20,7 +20,8 @@
             <a href="${pageContext.request.contextPath}/employee/login">切换用户</a>
         </div>
         <div>
-            <a href="${pageContext.request.contextPath}/springklerHead/list">喷头管理</a>
+            <a href="${pageContext.request.contextPath}/springklerHead/list">喷头管理</a>|
+            <a href="${pageContext.request.contextPath}/sensorData/list">传感器管理</a>
         </div>
     </c:if>
     <c:if test="${empty employee}">

@@ -3,15 +3,16 @@ package com.springmvc.controller;
 import com.springmvc.entity.Employee;
 import com.springmvc.service.EmployeeService;
 import com.springmvc.util.Encryption;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -122,5 +123,40 @@ public class empolyeeController {
     public String remove(String en){
         employeeService.remove(en);
         return "redirect:/employee/list";
+    }
+    @ResponseBody
+    @RequestMapping(value = "/login",produces = "application/json;charset=utf-8")
+    public String login(String en, String password){
+        Employee employee = employeeService.login(en,password);
+
+        String jsonRseult = com.alibaba.fastjson.JSON.toJSONString(employee);
+        System.out.println(jsonRseult);
+
+        //return json
+        return jsonRseult;
+    }
+    @ResponseBody
+    @RequestMapping(value = "/changePassword",produces = "application/json;charset=utf-8")
+    public String chenge(HttpSession session, @RequestParam("en") String en,@RequestParam("password") String password, @RequestParam("newPassword") String new1){
+/*      第二种获取android客户端传递值的方式：
+        String userName=request.getParameter("userName");
+        String password=request.getParameter("password");*/
+        Employee record = new Employee();
+//        en = "1607094226";
+//        password = "000000";
+        record.setEn(en);
+        record.setPassword(Encryption.MD5(password));
+        List<Employee> list = employeeService.selectSelective(record);
+        if (list.size() == 0){
+            String jsonResult = com.alibaba.fastjson.JSON.toJSONString("密码错误");
+            System.out.println(jsonResult);
+            return jsonResult;
+        }else {
+            record.setPassword(Encryption.MD5(new1));
+            employeeService.changePassword(record);
+            String jsonResult = com.alibaba.fastjson.JSON.toJSONString("修改成功");
+            System.out.println(jsonResult);
+            return jsonResult;
+        }
     }
 }

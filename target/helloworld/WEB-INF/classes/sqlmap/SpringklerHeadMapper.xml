@@ -4,14 +4,14 @@
   <resultMap id="BaseResultMap" type="com.springmvc.entity.SpringklerHead" >
     <id column="springkler_id" property="springklerId" jdbcType="INTEGER" />
     <result column="location" property="location" jdbcType="VARCHAR" />
-    <result column="installtime" property="installtime" jdbcType="TIMESTAMP" />
+    <result column="installtime" property="installtime" jdbcType="VARCHAR" />
     <result column="state" property="state" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     springkler_id, location, installtime, state
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
+    select 
     <include refid="Base_Column_List" />
     from springkler_head
     where springkler_id = #{springklerId,jdbcType=INTEGER}
@@ -26,9 +26,9 @@
     where springkler_id = #{springklerId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.springmvc.entity.SpringklerHead" >
-    insert into springkler_head (springkler_id, location,
+    insert into springkler_head (springkler_id, location, installtime, 
       state)
-    values (#{springklerId,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR},
+    values (#{springklerId,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR}, #{installtime,jdbcType=VARCHAR}, 
       #{state,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.springmvc.entity.SpringklerHead" >
@@ -55,7 +55,7 @@
         #{location,jdbcType=VARCHAR},
       </if>
       <if test="installtime != null" >
-        #{installtime,jdbcType=TIMESTAMP},
+        #{installtime,jdbcType=VARCHAR},
       </if>
       <if test="state != null" >
         #{state,jdbcType=VARCHAR},
@@ -69,7 +69,7 @@
         location = #{location,jdbcType=VARCHAR},
       </if>
       <if test="installtime != null" >
-        installtime = #{installtime,jdbcType=TIMESTAMP},
+        installtime = #{installtime,jdbcType=VARCHAR},
       </if>
       <if test="state != null" >
         state = #{state,jdbcType=VARCHAR},
@@ -80,7 +80,7 @@
   <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.SpringklerHead" >
     update springkler_head
     set location = #{location,jdbcType=VARCHAR},
-      installtime = #{installtime,jdbcType=TIMESTAMP},
+      installtime = #{installtime,jdbcType=VARCHAR},
       state = #{state,jdbcType=VARCHAR}
     where springkler_id = #{springklerId,jdbcType=INTEGER}
   </update>

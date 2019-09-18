@@ -1,6 +1,5 @@
 package com.springmvc.service.impl;
 
-import com.springmvc.dao.SensorDataMapper;
 import com.springmvc.dao.SpringklerHeadMapper;
 import com.springmvc.entity.SpringklerHead;
 import com.springmvc.service.SpringklerHeadService;

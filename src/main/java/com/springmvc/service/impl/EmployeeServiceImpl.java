@@ -26,7 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public Employee login(String en, String password) {
         Employee employee = mapper.selectByPrimaryKey(en);
-        if(employee!=null&&employee.getPassword().equals(password)){
+        if(employee!=null&&employee.getPassword().equals(Encryption.MD5(password))){
             return  employee;
         }
         return null;
