@@ -54,7 +54,7 @@ public class adminController {
     @RequestMapping(value = "/admin/logout", method = RequestMethod.GET)
     public String logout(HttpSession session){
         session.invalidate();
-        return "initial";
+        return "login";
     }
 
     @RequestMapping(value = "/admin/adminInfo",method = RequestMethod.GET)
@@ -63,7 +63,7 @@ public class adminController {
         if (admin != null){
             model.addAttribute("admin",admin);
         }
-        return "adminInfo";
+        return "admin_info";
     }
 
     @RequestMapping(value = "/admin/change_password",method = RequestMethod.GET)

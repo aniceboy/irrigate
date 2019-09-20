@@ -1,3 +1,10 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: 牛萌
+  Date: 2019/9/19
+  Time: 21:06
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%
@@ -31,7 +38,6 @@
 
 <div id="pie" style="width: 500px;height: 300px;"></div>
 <script>
-
     //获取到json的长度.
     function getJsonLength(json){
         var jsonLength = 0;
@@ -40,12 +46,8 @@
         }
         return jsonLength;
     }
-
-
-
     var direction =  ${direction};
     var springklerId = 1;
-
     //初始化echarts
     var pieCharts = echarts.init(document.getElementById("pie"));
     //设置属性
@@ -62,7 +64,6 @@
             }
         ],
         series : [
-
         ]
     });
     //显示一段动画
@@ -76,9 +77,7 @@
         url: '${pageContext.request.contextPath}/sensorData/get_tDataCharts?direction='+direction+'&springklerId'+springklerId,
         dataType: "json",
         success: function (result) {
-
             var resultLength = getJsonLength(result);
-
             if (result != null && result !="" && resultLength >0 ) {
                 //挨个取出类别并填入类别数组 //x坐标的值
                 for(var i=0; i<resultLength; i++){
@@ -112,8 +111,6 @@
                 pieCharts.hideLoading();//隐藏加载动画
                 alert("没有数据");
             }
-
-
         }
     })
 </script>

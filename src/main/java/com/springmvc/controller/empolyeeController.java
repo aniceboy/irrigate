@@ -29,8 +29,9 @@ public class empolyeeController {
         return "employee_login";
     }
 
-    @RequestMapping(value = "/emloyee/login",method = RequestMethod.POST)
-    public  String loginValidate(HttpSession session,Model model,@ModelAttribute Employee employee){
+    @RequestMapping(value = "/employee/login",method = RequestMethod.POST)
+    public  String loginEmployee(HttpSession session,Model model,@ModelAttribute Employee employee){
+//        System.out.println(employee.getEn());
         List<Employee> list = new ArrayList<Employee>();
         Employee record = new Employee();
         record.setEn(employee.getEn());
@@ -56,7 +57,7 @@ public class empolyeeController {
     @RequestMapping(value = "/employee/logout", method = RequestMethod.GET)
     public String logout(HttpSession session){
         session.invalidate();
-        return "initial";
+        return "login";
     }
 
     @RequestMapping(value = "/employee/employeeInfo",method = RequestMethod.GET)
@@ -65,7 +66,7 @@ public class empolyeeController {
         if (employee != null){
             model.addAttribute("employee",employee);
         }
-        return "employeeInfo";
+        return "employee_info";
     }
     @RequestMapping(value = "/employee/change_password",method = RequestMethod.GET)
     public String toChangePassword(){

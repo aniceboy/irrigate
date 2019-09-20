@@ -8,6 +8,6 @@ public class initialController {
 
     @RequestMapping("/initial")
     public String goInitial(){
-        return "initial";
+        return "login";
     }
 }

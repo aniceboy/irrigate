@@ -16,6 +16,7 @@ public class areaController {
     @RequestMapping(value = "/list")
     public String list(Map<String,Object> map){
         map.put("list",areaService.getAll());
+        System.out.println(areaService.getAll().size());
         return "admin_area_list";
     }
     @RequestMapping("/to_add")
@@ -25,6 +26,7 @@ public class areaController {
     }
     @RequestMapping("/add")
     public String add(Area area){
+//        System.out.println(area.getLocation());
         areaService.add(area);
         return "redirect:list";
     }
